@@ -104,10 +104,38 @@ fieldset { min-width: 0; border: 1px solid var(--line); border-radius: .35rem; m
 legend { font-weight: 650; }
 .form-actions { justify-content: flex-end; }
 
-.report { max-width: 760px; }
-.report section { margin-top: 1.75rem; padding-top: 1.45rem; border-top: 1px solid var(--line); }
+.report { max-width: 800px; }
+.report section { margin-top: 2rem; padding-top: 1.6rem; border-top: 1px solid var(--line); scroll-margin-top: 1rem; }
+.report section h2 { font-size: clamp(1.35rem, 3vw, 1.7rem); }
+.report h3 { font-size: 1.05rem; margin: 1.35rem 0 .45rem; }
+.report h3 + p { margin-top: 0; }
+.report-contents {
+  padding: 1.15rem 1.25rem;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  border-radius: .5rem;
+  background: var(--paper);
+}
+.report-contents ol { margin-bottom: 0; }
 .report ul, .report ol { padding-left: 1.4rem; }
 .report li + li { margin-top: .55rem; }
+.report-flows { margin-block: 1.3rem; }
+.report figure { margin: 1rem 0; }
+.report figure img { display: block; max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: .5rem; }
+.report figcaption { margin-top: .45rem; color: var(--muted); font-size: .9rem; }
+.report pre {
+  overflow-x: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: .9rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: .5rem;
+  background: #e8effa;
+  font-size: .9rem;
+}
+.report pre code { padding: 0; background: transparent; }
+.report caption { padding: .7rem .85rem; font-weight: 650; text-align: left; }
+.report table { min-width: 30rem; }
 code { background: #e8effa; padding: .1em .25em; border-radius: .15rem; overflow-wrap: anywhere; }
 
 @media (max-width: 420px) {

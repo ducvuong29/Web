@@ -15,46 +15,129 @@
   </header>
   <main class="frame report">
     <h1>Báo cáo thực hành React CRUD</h1>
-    <p class="intro">Ứng dụng quản lý người dùng dùng React 18, ReactDOM và Babel Standalone qua CDN. Bài thực hành minh họa cách dùng Hooks, truyền dữ liệu qua props và cập nhật state khi thêm, sửa hoặc xóa người dùng.</p>
+    <p class="intro">Bài thực hành xây dựng một danh sách người dùng có thể tìm kiếm, thêm, sửa và xóa bằng React 18. Báo cáo trình bày cách các component phối hợp, những lỗi cần xử lý và kết quả kiểm thử trên Vercel.</p>
 
-    <section>
-      <h2>1. Cấu trúc và luồng dữ liệu</h2>
-      <ul>
-        <li><code>App</code> giữ từ khóa, người dùng vừa thêm và trạng thái tải. Component cha truyền dữ liệu và callback xuống qua props.</li>
-        <li><code>SearchForm</code> gửi từ khóa về <code>App</code> mỗi khi người dùng nhập. <code>App</code> chuyển từ khóa xuống <code>ResultTable</code> để lọc theo họ tên hoặc tên đăng nhập.</li>
-        <li><code>AddUser</code> mở form thêm và gửi bản ghi mới lên <code>App</code>. <code>ResultTable</code> nhận bản ghi qua props, thêm vào danh sách trong <code>useEffect</code> và báo lại để <code>App</code> xóa giá trị tạm.</li>
-        <li><code>ResultTable</code> giữ danh sách người dùng. <code>UserForm</code> dùng chung cho thêm và sửa, với các ô nhập được điều khiển bằng <code>useState</code>.</li>
-      </ul>
-    </section>
-
-    <section>
-      <h2>2. Cách triển khai CRUD</h2>
+    <nav class="report-contents" aria-labelledby="muc-luc">
+      <h2 id="muc-luc">Mục lục</h2>
       <ol>
-        <li><strong>Đọc.</strong> Gọi API JSONPlaceholder khi bảng được gắn vào trang. Dùng <code>filter()</code> để tìm kiếm và <code>map()</code> để hiển thị các bản ghi.</li>
-        <li><strong>Thêm.</strong> Yêu cầu họ tên và tên đăng nhập. Bản ghi mới có ID lớn hơn các ID hiện có, kể cả khi danh sách đã bị xóa một hàng.</li>
-        <li><strong>Sửa.</strong> Sao chép bản ghi và đối tượng <code>address</code> vào bản nháp. Khi lưu, dùng <code>map()</code> thay đúng bản ghi theo ID. Hủy form sẽ bỏ bản nháp.</li>
-        <li><strong>Xóa.</strong> Dùng <code>filter()</code> để bỏ bản ghi theo ID ngay khi bấm Xóa, theo yêu cầu ở bước 7.</li>
+        <li><a href="#muc-tieu">Mục tiêu và phạm vi</a></li>
+        <li><a href="#component">Cấu trúc component</a></li>
+        <li><a href="#du-lieu">State, props và luồng dữ liệu</a></li>
+        <li><a href="#crud">Cách triển khai CRUD</a></li>
+        <li><a href="#loi">Các lỗi và cách xử lý</a></li>
+        <li><a href="#kiem-thu">Kết quả kiểm thử và triển khai</a></li>
+        <li><a href="#tong-ket">Tổng kết và tài liệu</a></li>
       </ol>
-      <p>Ứng dụng dùng CSS để trình bày bảng và dùng hộp thoại cho form thêm, sửa. Các thao tác ghi cập nhật state trong trình duyệt. Khi tải lại trang, danh sách được nạp lại từ API.</p>
+    </nav>
+
+    <section id="muc-tieu">
+      <h2>1. Mục tiêu và phạm vi</h2>
+      <p>Ứng dụng thực hành bốn thao tác CRUD trên danh sách người dùng. Trang kết quả dùng HTML, CSS, React 18, ReactDOM và Babel Standalone qua CDN theo cách khởi tạo trong PDF. React gắn vào phần tử <code>#root</code> bằng <code>ReactDOM.createRoot()</code>.</p>
+      <p>JSONPlaceholder cung cấp dữ liệu ban đầu. Thao tác thêm, sửa và xóa cập nhật state trong trình duyệt. Khi tải lại trang, danh sách được nạp lại từ API.</p>
     </section>
 
-    <section>
-      <h2>3. Các bước kiểm tra</h2>
-      <ol>
-        <li>Mở trang kết quả và kiểm tra danh sách tải từ API. Nhập <code>bret</code> để lọc theo tên đăng nhập, rồi xóa từ khóa để xem lại toàn bộ danh sách.</li>
-        <li>Thử lưu form thêm khi còn thiếu họ tên hoặc tên đăng nhập. Điền hai trường bắt buộc và địa chỉ, lưu rồi tìm bản ghi mới.</li>
-        <li>Sửa thành phố của bản ghi mới và bấm Hủy. Mở lại form, lưu thay đổi và kiểm tra thành phố trên bảng.</li>
-        <li>Xóa bản ghi vừa tạo và kiểm tra hàng tương ứng biến mất. Tải lại trang để khôi phục dữ liệu mẫu.</li>
-      </ol>
-      <p>Kiểm tra trên Chrome đã xác nhận API trả về 10 người dùng, tìm kiếm theo cả hai trường, form chặn khi thiếu thông tin bắt buộc, ID mới không trùng sau khi xóa một hàng và thao tác Hủy giữ nguyên địa chỉ cũ.</p>
+    <section id="component">
+      <h2>2. Cấu trúc component</h2>
+      <figure>
+        <pre>App
+├─ SearchForm
+├─ AddUser
+│  └─ UserForm (khi thêm)
+└─ ResultTable
+   └─ UserForm (khi sửa)</pre>
+        <figcaption>Cây component của trang quản lý người dùng.</figcaption>
+      </figure>
+      <p><code>App</code> nối ba component con. <code>SearchForm</code> nhận từ khóa, <code>AddUser</code> điều khiển hộp thoại thêm, còn <code>ResultTable</code> quản lý danh sách và chọn bản ghi cần sửa. Hai hộp thoại dùng chung <code>UserForm</code> vì có cùng các trường và quy tắc kiểm tra dữ liệu. Mỗi lần mở, form khởi tạo bản nháp từ bản ghi được truyền vào.</p>
     </section>
 
-    <section>
-      <h2>4. Tài liệu và mã nguồn</h2>
+    <section id="du-lieu">
+      <h2>3. State, props và luồng dữ liệu</h2>
+      <p><code>App</code> giữ <code>keyword</code> và <code>newUser</code> vì sự kiện phát sinh ở một component con và kết quả được dùng ở component con khác. Trạng thái tải cũng đặt ở <code>App</code> để bảng có thể báo tiến độ và nút Thêm chỉ được bật sau khi dữ liệu sẵn sàng. Danh sách, bản ghi đang sửa và bản nháp form nằm ở component trực tiếp sử dụng chúng.</p>
+      <p>Bảng tính các hàng cần hiển thị từ <code>users</code> và <code>keyword</code> trong mỗi lần render. Nhờ vậy, nếu danh sách thay đổi khi bộ lọc đang bật, kết quả tự được tính lại. Bộ đếm lấy số hàng khớp và tổng số bản ghi từ cùng danh sách, nên vẫn phản ánh đúng sau khi thêm hoặc xóa.</p>
+      <ol class="report-flows">
+        <li><strong>Tìm kiếm.</strong> <code>SearchForm</code> gọi <code>onChangeValue</code> khi người dùng gõ. <code>App</code> cập nhật <code>keyword</code> rồi truyền xuống <code>ResultTable</code> để lọc lại danh sách.</li>
+        <li><strong>Thêm người dùng.</strong> <code>AddUser</code> gửi bản ghi qua <code>onAdd</code>. <code>App</code> chuyển bản ghi xuống bảng qua prop <code>user</code>. Sau khi thêm, bảng gọi <code>onAdded</code> để xóa giá trị tạm ở <code>App</code>.</li>
+      </ol>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Bảng props truyền từ App">
+        <table>
+          <caption>Props truyền từ App</caption>
+          <thead><tr><th scope="col">Component nhận</th><th scope="col">Prop</th><th scope="col">Vai trò</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">SearchForm</th><td><code>onChangeValue</code></td><td>Gửi từ khóa lên state cha.</td></tr>
+            <tr><th scope="row">AddUser</th><td><code>onAdd</code>, <code>disabled</code></td><td>Gửi bản ghi hợp lệ và điều khiển khả năng mở form.</td></tr>
+            <tr><th scope="row">ResultTable</th><td><code>keyword</code>, <code>user</code>, <code>onAdded</code></td><td>Lọc bảng, nhận người dùng mới và báo đã xử lý.</td></tr>
+            <tr><th scope="row">ResultTable</th><td><code>loadState</code>, <code>onLoadState</code></td><td>Hiển thị và cập nhật trạng thái tải danh sách.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="crud">
+      <h2>4. Cách triển khai CRUD</h2>
+      <h3>Đọc và tìm kiếm</h3>
+      <p><code>useEffect</code> trong <code>ResultTable</code> gọi API khi bảng được gắn vào trang. Khi tải xong, bảng dùng <code>map()</code> để hiển thị từng người dùng với ID làm <code>key</code>. Mỗi lần từ khóa thay đổi, <code>filter()</code> chạy trên danh sách trong bộ nhớ. <code>trim()</code> bỏ khoảng trắng ở hai đầu và <code>toLowerCase()</code> giúp tìm không phân biệt chữ hoa, chữ thường.</p>
+      <h3>Thêm và cập nhật địa chỉ</h3>
+      <p><code>UserForm</code> lấy giá trị các ô nhập từ state <code>draft</code>. Khi sửa một trường của <code>address</code>, hàm cập nhật tạo bản sao của cả bản ghi và đối tượng địa chỉ. Ví dụ, khi đổi thành phố, thông tin đường và căn hộ vẫn được giữ.</p>
+      <pre><code>setDraft((previous) =&gt; Object.hasOwn(previous.address, name)
+  ? { ...previous, address: { ...previous.address, [name]: value } }
+  : { ...previous, [name]: value });</code></pre>
+      <p>Form yêu cầu họ tên và tên đăng nhập. Các giá trị chỉ có dấu cách cũng bị chặn. Khi form hợp lệ, bảng cấp ID dựa trên ID lớn nhất hiện có rồi thêm bản ghi vào cuối danh sách.</p>
+      <h3>Sửa và xóa</h3>
+      <p>Form sửa khởi tạo bản nháp từ người dùng được chọn và sao chép riêng <code>address</code>. Khi lưu, <code>map()</code> thay đúng bản ghi có ID tương ứng. Khi hủy, bảng tiếp tục hiển thị bản ghi cũ. Theo bước 7 của PDF, nút Xóa loại bản ghi ngay bằng <code>filter()</code> và hiển thị thông báo kết quả.</p>
+      <pre><code>setUsers((previous) =&gt; previous.map((item) =&gt;
+  item.id === updated.id ? updated : item));
+
+setUsers((previous) =&gt; previous.filter((entry) =&gt;
+  entry.id !== item.id));</code></pre>
+      <p>Hai phép cập nhật nhận danh sách trước đó từ React rồi trả về mảng mới. ID xác định hàng mục tiêu ngay cả khi đang lọc, vì vị trí trong bảng có thể khác vị trí trong danh sách đầy đủ.</p>
+    </section>
+
+    <section id="loi">
+      <h2>5. Các lỗi và cách xử lý</h2>
+      <h3>Nút Hủy gọi hàm ngay khi render</h3>
+      <p>Ở ví dụ bước 5, trang 6 của PDF, biểu thức <code>onClick={setAdding(false)}</code> chạy ngay khi React tạo nút. Khi người dùng vừa mở form, setter có thể đóng form trước khi họ thao tác. Bản triển khai truyền callback <code>onClick={onClose}</code> và đặt nút là <code>type="button"</code> để Hủy chỉ đóng hộp thoại khi được bấm.</p>
+      <h3>Trùng ID sau khi xóa một hàng</h3>
+      <p>Trang 6 cũng minh họa cấp ID bằng <code>prev.length + 1</code>. Với danh sách ID từ 1 đến 10, nếu xóa ID 2 thì danh sách còn 9 phần tử và ID được cấp tiếp là 10, vốn đã tồn tại. Trùng ID có thể làm trùng <code>key</code> và khiến thao tác sửa hoặc xóa theo ID đụng nhiều hàng. Bản triển khai lấy ID lớn nhất đang có cộng 1. Ca kiểm thử xóa một hàng rồi thêm đã nhận ID 11.</p>
+      <h3>Địa chỉ thay đổi dù bấm Hủy</h3>
+      <p>Bước 6 của PDF lưu ý về đối tượng lồng nhau. Nếu form giữ tham chiếu chung đến <code>address</code> và sửa trực tiếp, thay đổi có thể tác động lên bản ghi gốc trước khi lưu. Form tạo bản nháp với địa chỉ riêng và cập nhật theo cách bất biến. Kiểm thử đổi thành phố rồi hủy cho thấy địa chỉ trong bảng vẫn giữ nguyên.</p>
+      <h3>Bảng chờ mãi khi API gặp lỗi</h3>
+      <p>Đoạn tải dữ liệu ở bước 4 minh họa luồng thành công. Trong bản triển khai, <code>response.ok</code> được kiểm tra trước khi đọc JSON. Khi yêu cầu thất bại, giao diện hiện thông báo tải lại và giữ nút Thêm ở trạng thái tắt. Cách này cũng tránh cho người dùng thêm bản ghi trước khi dữ liệu gốc tải xong.</p>
+    </section>
+
+    <section id="kiem-thu">
+      <h2>6. Kết quả kiểm thử và triển khai</h2>
+      <p>Các ca dưới đây đã chạy bằng Chrome trên bản triển khai công khai. Hai trang được phục vụ qua HTTPS trên cùng domain và có liên kết qua lại.</p>
+      <p>Mã bài thực hành nằm trong <code>public/react-crud/</code>. Vercel nhận bản cập nhật từ nhánh <code>main</code> của kho GitHub và phục vụ các tệp HTML, CSS và JSX ở đường dẫn cố định. Trên trang demo, trình duyệt tải thư viện từ CDN, Babel biên dịch JSX và React gọi API dữ liệu mẫu.</p>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Bảng kết quả kiểm thử">
+        <table>
+          <caption>Ca kiểm thử trên Vercel</caption>
+          <thead><tr><th scope="col">Ca kiểm thử</th><th scope="col">Kết quả quan sát</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Tải danh sách</th><td>Bảng hiển thị 10 người dùng từ API.</td></tr>
+            <tr><th scope="row">Tìm theo tên và username</th><td><code>ervin</code> và <code>bReT</code> mỗi từ khóa trả về đúng một người. Từ khóa không khớp hiện thông báo.</td></tr>
+            <tr><th scope="row">Thêm sau khi xóa</th><td>Form chặn khi thiếu họ tên. Bản ghi hợp lệ xuất hiện với ID 11 sau khi xóa một hàng mẫu.</td></tr>
+            <tr><th scope="row">Sửa địa chỉ</th><td>Hủy giữ nguyên thành phố cũ. Lưu cập nhật thành phố và giữ thông tin đường.</td></tr>
+            <tr><th scope="row">Xóa bản ghi</th><td>Hàng mục tiêu biến mất ngay khi bấm Xóa.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Để chạy lại bài kiểm thử, mở ứng dụng, thử từ khóa <code>bret</code> rồi xóa từ khóa. Xóa một hàng mẫu, thêm người dùng có tên đăng nhập riêng, thử sửa địa chỉ và hủy một lần trước khi lưu. Tải lại trang để đưa danh sách về dữ liệu mẫu ban đầu.</p>
+      <figure>
+        <img src="giao-dien.webp" width="1180" height="1135" loading="lazy"
+          alt="Trang quản lý người dùng với ô tìm kiếm, nút thêm và bảng 10 người dùng mẫu có nút sửa, xóa">
+        <figcaption>Giao diện thực tế sau khi tải danh sách từ JSONPlaceholder.</figcaption>
+      </figure>
+      <p><a href="ket-qua.html">Mở ứng dụng để thử các thao tác</a>.</p>
+    </section>
+
+    <section id="tong-ket">
+      <h2>7. Tổng kết và tài liệu</h2>
+      <p>Bài thực hành cho thấy khi nào nên đưa state lên component cha và khi nào nên giữ state trong component trực tiếp sử dụng. Cách tách bản nháp khỏi danh sách giúp thao tác Hủy hoạt động đúng. Việc dùng ID làm khóa cho phép tìm đúng bản ghi khi thêm, sửa và xóa liên tiếp.</p>
       <ul>
         <li>Tài liệu thực hành <cite>Tài liệu hướng dẫn lập trình React cơ bản (CRUD)</cite>, trang 1–8.</li>
-        <li>Dữ liệu mẫu từ <a href="https://jsonplaceholder.typicode.com/users">JSONPlaceholder</a>.</li>
-        <li><a href="app.jsx">Mã nguồn React</a> và <a href="ket-qua.html">ứng dụng chạy thử</a>.</li>
+        <li>API dữ liệu mẫu <a href="https://jsonplaceholder.typicode.com/users">JSONPlaceholder</a>.</li>
+        <li>Tham khảo cách tổ chức mục và trình bày kết quả trong <a href="https://it-4409.vercel.app/Bai%20tap%20React%20-%20CRUD/index.html#bao-cao">báo cáo mẫu IT4409</a>.</li>
+        <li><a href="app.jsx">Mã nguồn React của bài thực hành</a>.</li>
       </ul>
     </section>
   </main>
