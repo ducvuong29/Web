@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Báo cáo thực hành React CRUD</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="frame" aria-label="Bài thực hành React CRUD">
+      <span>React CRUD</span>
+      <a href="ket-qua.html">Mở ứng dụng</a>
+    </nav>
+  </header>
+  <main class="frame report">
+    <h1>Báo cáo thực hành React CRUD</h1>
+    <p class="intro">Ứng dụng quản lý người dùng dùng React 18, ReactDOM và Babel Standalone qua CDN. Bài thực hành minh họa cách dùng Hooks, truyền dữ liệu qua props và cập nhật state khi thêm, sửa hoặc xóa người dùng.</p>
+
+    <section>
+      <h2>1. Cấu trúc và luồng dữ liệu</h2>
+      <ul>
+        <li><code>App</code> giữ từ khóa, người dùng vừa thêm và trạng thái tải. Component cha truyền dữ liệu và callback xuống qua props.</li>
+        <li><code>SearchForm</code> gửi từ khóa về <code>App</code> mỗi khi người dùng nhập. <code>App</code> chuyển từ khóa xuống <code>ResultTable</code> để lọc theo họ tên hoặc tên đăng nhập.</li>
+        <li><code>AddUser</code> mở form thêm và gửi bản ghi mới lên <code>App</code>. <code>ResultTable</code> nhận bản ghi qua props, thêm vào danh sách trong <code>useEffect</code> và báo lại để <code>App</code> xóa giá trị tạm.</li>
+        <li><code>ResultTable</code> giữ danh sách người dùng. <code>UserForm</code> dùng chung cho thêm và sửa, với các ô nhập được điều khiển bằng <code>useState</code>.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>2. Cách triển khai CRUD</h2>
+      <ol>
+        <li><strong>Đọc.</strong> Gọi API JSONPlaceholder khi bảng được gắn vào trang. Dùng <code>filter()</code> để tìm kiếm và <code>map()</code> để hiển thị các bản ghi.</li>
+        <li><strong>Thêm.</strong> Yêu cầu họ tên và tên đăng nhập. Bản ghi mới có ID lớn hơn các ID hiện có, kể cả khi danh sách đã bị xóa một hàng.</li>
+        <li><strong>Sửa.</strong> Sao chép bản ghi và đối tượng <code>address</code> vào bản nháp. Khi lưu, dùng <code>map()</code> thay đúng bản ghi theo ID. Hủy form sẽ bỏ bản nháp.</li>
+        <li><strong>Xóa.</strong> Dùng <code>filter()</code> để bỏ bản ghi theo ID ngay khi bấm Xóa, theo yêu cầu ở bước 7.</li>
+      </ol>
+      <p>Ứng dụng dùng CSS để trình bày bảng và dùng hộp thoại cho form thêm, sửa. Các thao tác ghi cập nhật state trong trình duyệt. Khi tải lại trang, danh sách được nạp lại từ API.</p>
+    </section>
+
+    <section>
+      <h2>3. Các bước kiểm tra</h2>
+      <ol>
+        <li>Mở trang kết quả và kiểm tra danh sách tải từ API. Nhập <code>bret</code> để lọc theo tên đăng nhập, rồi xóa từ khóa để xem lại toàn bộ danh sách.</li>
+        <li>Thử lưu form thêm khi còn thiếu họ tên hoặc tên đăng nhập. Điền hai trường bắt buộc và địa chỉ, lưu rồi tìm bản ghi mới.</li>
+        <li>Sửa thành phố của bản ghi mới và bấm Hủy. Mở lại form, lưu thay đổi và kiểm tra thành phố trên bảng.</li>
+        <li>Xóa bản ghi vừa tạo và kiểm tra hàng tương ứng biến mất. Tải lại trang để khôi phục dữ liệu mẫu.</li>
+      </ol>
+      <p>Kiểm tra trên Chrome đã xác nhận API trả về 10 người dùng, tìm kiếm theo cả hai trường, form chặn khi thiếu thông tin bắt buộc, ID mới không trùng sau khi xóa một hàng và thao tác Hủy giữ nguyên địa chỉ cũ.</p>
+    </section>
+
+    <section>
+      <h2>4. Tài liệu và mã nguồn</h2>
+      <ul>
+        <li>Tài liệu thực hành <cite>Tài liệu hướng dẫn lập trình React cơ bản (CRUD)</cite>, trang 1–8.</li>
+        <li>Dữ liệu mẫu từ <a href="https://jsonplaceholder.typicode.com/users">JSONPlaceholder</a>.</li>
+        <li><a href="app.jsx">Mã nguồn React</a> và <a href="ket-qua.html">ứng dụng chạy thử</a>.</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
